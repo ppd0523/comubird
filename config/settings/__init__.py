@@ -49,7 +49,7 @@ INSTALLED_APPS = [
 ]
 SITE_ID = 1
 GRAPHENE = {
-    "SCHEMA": "stock.schema.schema"
+    "SCHEMA": 'config.schema.schemas'
 }
 
 MIDDLEWARE = [

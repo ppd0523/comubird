@@ -2,4 +2,3 @@ django
 django-allauth
 graphene-django
 psycopg2-binary
-graphene_django
