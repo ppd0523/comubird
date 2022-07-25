@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from member.models import User
+from django.core.exceptions import ValidationError
 
 
 class Stock(models.Model):
@@ -11,6 +12,17 @@ class Stock(models.Model):
         return f'{self.name}({self.code})'
 
 
+def upload_filter(instance, filename):
+    return f'{instance.owner.pk}_{filename}'
+
+
+def validate_file_size(value):
+    if value.size > 4096:
+        raise ValidationError("The maximum file size can be 4KB")
+    else:
+        return value
+
+
 class Filter(models.Model):
     id = models.AutoField(primary_key=True)
     owner = models.ForeignKey(User, to_field='email', null=True, blank=True, on_delete=models.SET_NULL)
@@ -19,8 +31,7 @@ class Filter(models.Model):
     created_date = models.DateTimeField(default=timezone.localdate, null=False, blank=False, editable=False)
     deleted_date = models.DateTimeField(default=None, null=True, blank=True)
     permission = models.PositiveSmallIntegerField(default=1, null=False, blank=False)
-    # file = models.FileField(upload_to=upload_filter, validators=[validate_size], )
-    # file = models.FilePathField()
+    file = models.FileField(upload_to=upload_filter, validators=[validate_file_size], )
 
     def __str__(self):
         return f'{self.owner} {self.name}'
