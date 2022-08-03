@@ -1,6 +1,8 @@
 from graphene import *
+from graphql import GraphQLError
 from stock.schema import *
 from member.schema import *
+from django.core.paginator import Paginator
 
 
 class PageInfo(ObjectType):
@@ -49,6 +51,15 @@ class Query(ObjectType):
     filters = Field(List(NonNull(FilterType)), title=String(), owner=String(), required=True)
     filter = Field(FilterType, id=ID(required=True, name='id'))
     user = Field(UserType, nickname=String())
+    me = Field(UserType)
+
+    @staticmethod
+    def resolve_me(root, info):
+        user = info.context.user
+        if not user.is_authenticated:
+            return GraphQLError("No login")
+
+        return user
 
     @staticmethod
     def resolve_user(root, info, nickname):
@@ -66,22 +77,15 @@ class Query(ObjectType):
                 return filters
             except User.DoesNotExist:
                 return []
-            except Filter.DoseNotExist:
-                return []
+
         elif title:
-            try:
-                filters = Filter.objects.filter(title=title)
-                return filters
-            except Filter.DoseNotExist:
-                return []
+            return  Filter.objects.filter(title=title)
+
         elif owner:
             try:
                 user = User.objects.get(nickname=owner)
-                filters = Filter.objects.filter(owner=user)
-                return filters
+                return Filter.objects.filter(owner=user)
             except User.DoesNotExist:
-                return []
-            except Filter.DoseNotExist:
                 return []
         else:
             return []

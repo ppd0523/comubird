@@ -31,7 +31,7 @@ class Filter(models.Model):
     index = models.PositiveSmallIntegerField(default=10)
     created_date = models.DateTimeField(default=timezone.localdate, null=False, blank=False, editable=False)
     deleted_date = models.DateTimeField(default=None, null=True, blank=True)
-    permission = models.PositiveSmallIntegerField(default=0, null=False, blank=False)
+    permission = models.PositiveSmallIntegerField(default=1, null=False, blank=False)
     file = models.FileField(upload_to=upload_filter, validators=[validate_file_size], )
 
     def __str__(self):
